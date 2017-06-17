@@ -350,12 +350,14 @@ if os.is("Windows") then
 					"../ThirdPartyLibs/openvr/samples/shared/pathtools.h",
 					"../ThirdPartyLibs/openvr/samples/shared/Vectors.h",
 	}
-	if os.is("Windows") then 
-		configuration {"x32"}
-			libdirs {"../ThirdPartyLibs/openvr/lib/win32"}
-		configuration {"x64"}
-			libdirs {"../ThirdPartyLibs/openvr/lib/win64"}
-		configuration{}
+	if os.is("Windows") then
+		files {
+                "../MultiThreading/b3Win32ThreadSupport.cpp",
+                "../MultiThreading/b3Win32ThreadSupport.h"
+		}
+		links {"winmm"}
+		defines {"__WINDOWS_MM__", "WIN32"}
+		libdirs {"../ThirdPartyLibs/openvr/lib/win32"}
 	end
 	
 	if os.is("Linux") then initX11() end
