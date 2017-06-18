@@ -38,13 +38,13 @@ project "App_BulletExampleBrowser"
 	if _OPTIONS["audio"] then
 			files {"../TinyAudio/*.cpp"}
 			defines {"B3_ENABLE_TINY_AUDIO"}
-			
+
 			if os.is("Windows") then
 				links {"winmm","Wsock32","dsound"}
 				defines {"WIN32","__WINDOWS_MM__","__WINDOWS_DS__"}
 			end
-			
-			if os.is("Linux") then initX11() 
+
+			if os.is("Linux") then initX11()
 			                defines  {"__OS_LINUX__","__LINUX_ALSA__"}
 				links {"asound","pthread"}
 			end
@@ -56,7 +56,7 @@ project "App_BulletExampleBrowser"
 				defines {"__OS_MACOSX__","__MACOSX_CORE__"}
 			end
 		end
-					
+
     if _OPTIONS["lua"] then
                 includedirs{"../ThirdPartyLibs/lua-5.2.3/src"}
                 links {"lua-5.2.3"}
@@ -67,7 +67,7 @@ project "App_BulletExampleBrowser"
 	defines {"INCLUDE_CLOTH_DEMOS"}
 
         files {
-        	
+
         "main.cpp",
         "ExampleEntries.cpp",
         "../InverseKinematics/*",
@@ -120,7 +120,7 @@ project "App_BulletExampleBrowser"
 		"../InverseDynamics/InverseDynamicsExample.cpp",
 		"../InverseDynamics/InverseDynamicsExample.h",
 		"../RobotSimulator/b3RobotSimulatorClientAPI.cpp",
-		"../RobotSimulator/b3RobotSimulatorClientAPI.h",		
+		"../RobotSimulator/b3RobotSimulatorClientAPI.h",
 		"../BasicDemo/BasicExample.*",
 		"../Tutorial/*",
 		"../ExtendedTutorials/*",
@@ -128,6 +128,7 @@ project "App_BulletExampleBrowser"
 		"../Utils/RobotLoggingUtil.h",
 		"../Evolution/NN3DWalkers.cpp",
 		"../Evolution/NN3DWalkers.h",
+    "../CentripitalTest/CentripitalTest.*",
 		"../Collision/*",
 		"../RoboticsLearning/*",
 		"../Collision/Internal/*",
@@ -137,7 +138,7 @@ project "App_BulletExampleBrowser"
 		"../ForkLift/ForkLiftDemo.*",
 		"../Importers/**",
 		"../../Extras/Serialize/BulletWorldImporter/*",
-		"../../Extras/Serialize/BulletFileLoader/*",	
+		"../../Extras/Serialize/BulletFileLoader/*",
 		"../Planar2D/Planar2D.*",
 		"../RenderingExamples/*",
 		"../VoronoiFracture/*",
@@ -179,11 +180,11 @@ if os.is("Linux") then
 end
 
 
-	
+
 project "BulletExampleBrowserLib"
 
 		hasCL = findOpenCL("clew")
-	
+
 		if (hasCL) then
 
 				-- project ("App_Bullet3_OpenCL_Demos_" .. vendor)
@@ -193,7 +194,7 @@ project "BulletExampleBrowserLib"
 		end
 
 		language "C++"
-				
+
 		kind "StaticLib"
 
   	includedirs {
@@ -209,14 +210,14 @@ project "BulletExampleBrowserLib"
 		files {"../LuaDemo/LuaPhysicsSetup.cpp"}
 	end
 
-	
-	
-			
+
+
+
 		initOpenGL()
 		initGlew()
 
 		defines {"INCLUDE_CLOTH_DEMOS"}
-			
+
 
 
 		files {
@@ -235,16 +236,13 @@ project "BulletExampleBrowserLib"
 		"../Utils/b3ResourcePath.*",
 		"GL_ShapeDrawer.cpp",
 		"InProcessExampleBrowser.cpp",
-	
-   
+
+
 
 		}
-		
-		
 
-if os.is("Linux") then 
+
+
+if os.is("Linux") then
 	initX11()
 end
-
-			
-
