@@ -56,6 +56,7 @@ struct CentriptialTest : public CommonRigidBodyBase
 	std::vector<unsigned int> gerbilWheelIndices;
 	btTriangleIndexVertexArray gerbilWheelArray;
 	btBvhTriangleMeshShape* gerbilWheelShape;
+	btTransform* gerbilWheelTransform;
 
 };
 
@@ -63,6 +64,12 @@ void CentriptialTest::stepSimulation(float deltaTime)
 {
 	if (m_dynamicsWorld)
 	{
+		btTransform tr = m_dynamicsWorld->getCollisionObjectArray()[0]->getWorldTransform();
+		static float angle = 0.f;
+		angle += 0.01f;
+		tr.setRotation(btQuaternion(btVector3(1, 0, 0), angle));
+		m_dynamicsWorld->getCollisionObjectArray()[0]->setWorldTransform(tr);
+
 		// TODO is there a way to keep cubes from going through the tube without changing the fixed timestep?
 		m_dynamicsWorld->stepSimulation(deltaTime, 30, 1./120.);
 	}
@@ -105,12 +112,12 @@ void CentriptialTest::initPhysics()
 		//createRigidBody(mass,groundTransform,groundShape, btVector4(0,0,1,1));
 	}
 
-	btTransform gerbilWheelTransform;
-	gerbilWheelTransform.setIdentity();
-	gerbilWheelTransform.setOrigin(btVector3(0, 0, 0));
+	gerbilWheelTransform = new btTransform();
+	gerbilWheelTransform->setIdentity();
+	gerbilWheelTransform->setOrigin(btVector3(0, 0, 0));
 	{
 		btScalar mass(0.);
-		createRigidBody(mass, gerbilWheelTransform, gerbilWheelShape);
+		createRigidBody(mass, *gerbilWheelTransform, gerbilWheelShape);
 	}
 
 
