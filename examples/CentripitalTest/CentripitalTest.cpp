@@ -117,7 +117,7 @@ void CentriptialTest::initPhysics()
 	gerbilWheelTransform->setOrigin(btVector3(0, 0, 0));
 	{
 		btScalar mass(0.);
-		createRigidBody(mass, *gerbilWheelTransform, gerbilWheelShape);
+		createRigidBody(mass, *gerbilWheelTransform, gerbilWheelShape,btVector4(1, 0, 0, 1), 5.0);
 	}
 
 
@@ -157,7 +157,7 @@ void CentriptialTest::initPhysics()
 										btScalar(0.2*j)));
 
 			
-					createRigidBody(mass,startTransform,colShape);
+					createRigidBody(mass,startTransform,colShape, btVector4(1, 0, 0, 1), 10.0);
 					
 
 				}

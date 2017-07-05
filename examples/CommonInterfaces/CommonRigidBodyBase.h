@@ -422,7 +422,7 @@ struct CommonRigidBodyBase : public CommonExampleInterface
 
 	}
 
-	btRigidBody*	createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape,  const btVector4& color = btVector4(1, 0, 0, 1))
+	btRigidBody*	createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape,  const btVector4& color = btVector4(1, 0, 0, 1), btScalar friction = 0.5)
 	{
 		btAssert((!shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
 
@@ -440,6 +440,7 @@ struct CommonRigidBodyBase : public CommonExampleInterface
 		btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
 
 		btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState, shape, localInertia);
+		cInfo.m_friction = friction;
 
 		btRigidBody* body = new btRigidBody(cInfo);
 		//body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
