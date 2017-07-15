@@ -60,15 +60,45 @@ struct CentriptialTest : public CommonRigidBodyBase
 
 };
 
+class WheelMotionState : public btMotionState {
+public: 
+	WheelMotionState(btScalar angVelocity, btVector3& axis);
+	virtual void getWorldTransform(btTransform& worldTrans) const;
+	virtual void setWorldTransform(const btTransform& worldTrans);
+
+private:
+	btScalar angVelocity;
+	btVector3 axis;
+	btTransform worldTransform;
+
+};
+
+WheelMotionState::WheelMotionState(btScalar angVelocity, btVector3& axis) :
+	// TODO add a stepSimulation(float deltaTime) to use angVelocity and axis
+	angVelocity(angVelocity),
+	axis(axis) {
+	worldTransform.setIdentity(); 
+}
+
+void WheelMotionState::getWorldTransform(btTransform& worldTrans) const {
+	worldTrans = worldTransform;
+}
+
+void WheelMotionState::setWorldTransform(const btTransform& worldTrans) {
+	worldTransform = worldTrans;
+}
+
 void CentriptialTest::stepSimulation(float deltaTime)
 {
 	if (m_dynamicsWorld)
 	{
-		btTransform tr = m_dynamicsWorld->getCollisionObjectArray()[0]->getWorldTransform();
+		// TODO move this into WheelMotionState. Add a stepSimulation(float deltaTime) to the motionstate.
+		btTransform tr;
+		dynamic_cast<btRigidBody*>(m_dynamicsWorld->getCollisionObjectArray()[0])->getMotionState()->getWorldTransform(tr);
 		static float angle = 0.f;
 		angle += 0.01f;
 		tr.setRotation(btQuaternion(btVector3(1, 0, 0), angle));
-		m_dynamicsWorld->getCollisionObjectArray()[0]->setWorldTransform(tr);
+		dynamic_cast<btRigidBody*>(m_dynamicsWorld->getCollisionObjectArray()[0])->getMotionState()->setWorldTransform(tr);
 
 		// TODO is there a way to keep cubes from going through the tube without changing the fixed timestep?
 		m_dynamicsWorld->stepSimulation(deltaTime, 30, 1./120.);
@@ -117,7 +147,14 @@ void CentriptialTest::initPhysics()
 	gerbilWheelTransform->setOrigin(btVector3(0, 0, 0));
 	{
 		btScalar mass(0.);
-		createRigidBody(mass, *gerbilWheelTransform, gerbilWheelShape,btVector4(1, 0, 0, 1), 5.0);
+		btRigidBody* gerbilWheelRigidBody = createRigidBody(mass, *gerbilWheelTransform, gerbilWheelShape,btVector4(1, 0, 0, 1), 5.0);
+		
+		// flag as kinimatic and prevent deactivation
+		gerbilWheelRigidBody->setCollisionFlags(gerbilWheelRigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+		gerbilWheelRigidBody->setActivationState(DISABLE_DEACTIVATION);
+
+		// KINEMATIC_OBJECTs need to provide their own motion state
+		gerbilWheelRigidBody->setMotionState(new WheelMotionState(1., btVector3(1., 0., 0.)));
 	}
 
 
@@ -185,18 +222,7 @@ void generateCircleVertices(float radius, float x, float angleStep, unsigned int
 
 	float angle = 0.0;
 	for (unsigned int index = 0; index < vertInCircle; ++index) {
-		//if (angle < M_HALF_PI) {
-			vertex.push_back(btVector3(x, radius * sin(angle), radius * cos(angle)));
-		/*}
-		else if (M_HALF_PI <= angle && angle < M_PI) {
-			vertex.push_back(btVector3(x, radius * sin(angle), -radius * cos(angle)));
-		}
-		else if (M_PI <= angle && angle < M_PI_AND_HALF) {
-			vertex.push_back(btVector3(x, -radius * sin(angle), -radius * cos(angle)));
-		}
-		else if (M_PI_AND_HALF <= angle) {
-			vertex.push_back(btVector3(x, -radius * sin(angle), radius * cos(angle)));
-		}*/
+		vertex.push_back(btVector3(x, radius * sin(angle), radius * cos(angle)));
 		angle += angleStep;
 	}
 }
@@ -337,6 +363,7 @@ CentriptialTest::generateTubeMeshX(float i_radius, float o_radius, float length,
 
 	// TODO this is horrible code
 	// - would like to use vector to avoid having to calculate the number of tris
+	// - but it would also be nice not to allocate twice
 	// - where should the vector memory live?
 	// - who owns and will delete the arrays?
 	btIndexedMesh m;
